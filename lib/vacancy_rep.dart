@@ -7,9 +7,10 @@ import 'package:syncfusion_flutter_xlsio/xlsio.dart' hide Column, Row;
 class Vacancy {
   int? id;
   final String name;
-  final String users;
+  final double users;
+  final String href;
 
-  Vacancy({this.id, required this.name, required this.users});
+  Vacancy({this.id, required this.name, required this.users, required this.href});
 }
 
 class VacancyRepository {
@@ -26,34 +27,3 @@ class VacancyRepository {
   void addNewVacancy(Vacancy vacancy) => _list.add(vacancy);
 
 }
-
-
-// class VacancyDataSource extends DataGridSource {
-//
-//   VacancyDataSource({required List<Vacancy> vacancyData}) {
-//     _vacancyData = vacancyData.map<DataGridRow>((Vacancy e) => DataGridRow(cells: <DataGridCell>[
-//       DataGridCell<int>(columnName: 'ID', value: e.id),
-//       DataGridCell<String>(columnName: 'VACANCY', value: e.name),
-//       DataGridCell<String>(columnName: 'VIEWERS', value: e.users),
-//     ]))
-//         .toList();
-//   }
-//
-//   List<DataGridRow> _vacancyData = <DataGridRow>[];
-//
-//   @override
-//   List<DataGridRow> get rows => _vacancyData;
-//
-//   @override
-//   DataGridRowAdapter buildRow(DataGridRow row) {
-//     return DataGridRowAdapter(
-//         cells: row.getCells().map<Widget>((DataGridCell cell) {
-//           return Container(
-//             alignment: Alignment.center,
-//             padding: const EdgeInsets.all(8.0),
-//             child: Text(cell.value.toString()),
-//           );
-//         }).toList()
-//     );
-//   }
-// }

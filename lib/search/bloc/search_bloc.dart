@@ -40,9 +40,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       sheet.getRangeByName('B1').setText('Название');
       sheet.getRangeByName('C1').setText('Просматривают');
       sheet.getRangeByName('D1').setText('Ссылка');
-      sheet.getRangeByName('A${i+2}').setText('${i+1}');
+      sheet.getRangeByName('A${i+2}').setNumber(i+1);
       sheet.getRangeByName('B${i+2}').setText(vac[i].name);
-      sheet.getRangeByName('C${i+2}').setText(vac[i].users);
+      sheet.getRangeByName('C${i+2}').setNumber(vac[i].users);
+      sheet.getRangeByName('D${i+2}').setText(vac[i].href);
     }
 
     final List<int> bytes = workbook.saveAsStream();
@@ -74,8 +75,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   
   Future<void> _parseData(data) async {
     final document = parse(data);
-    final vacancy = document.querySelectorAll(".serp-item");
-    print(vacancy.length);
+    final vacancy = document.querySelectorAll(".serp-item > div > div.vacancy-serp-item-body");
+    //print(vacancy.length);
 
 
     if (pagess == 0) {
@@ -83,17 +84,22 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       pages!.children.removeLast();
       var a = pages!.children.last.querySelector('.bloko-button');
       pagess = int.parse(a!.text);
-      print(pagess);
+      //print(pagess);
     }
 
     for (var i = 0; i < vacancy.length; i++) {
-        final name = vacancy[i].querySelector("div > div.vacancy-serp-item-body > div > div > h3");
-        final users = vacancy[i].querySelector("div > div.vacancy-serp-item-body > div.vacancy-serp-item-body__main-info > div.online-users--tWT3_ck7eF8Iv5SpZ6WL");
+        final name = vacancy[i].querySelector("div > div > h3");
+        final users = vacancy[i].querySelector("div.vacancy-serp-item-body__main-info > div.online-users--tWT3_ck7eF8Iv5SpZ6WL");
+        final htmlHref = vacancy[i].querySelector("div.vacancy-serp-item-body__main-info");
+        final href = htmlHref!.getElementsByTagName('a')
+            .where((e) => e.attributes.containsKey('href'))
+        .map((e) => e.attributes['href'])
+        .toList();
 
         RegExp exp = RegExp("[0-9]]");
-        var views = users?.text.replaceAll(RegExp('[^0-9]'), '') ?? '0';
+        var views = double.parse(users?.text.replaceAll(RegExp('[^0-9]'), '') ?? '0');
 
-        _repository.addNewVacancy(Vacancy(id: i, name: name?.text ?? 'error name', users: views));
+        _repository.addNewVacancy(Vacancy(id: i, name: name?.text ?? 'error name', users: views, href: href[0] ?? 'no link'));
     }
     _updateScreen();
   }
